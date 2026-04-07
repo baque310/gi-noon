@@ -1,0 +1,105 @@
+class AppAssets {
+  AppAssets._();
+
+  //svg icons
+  static const icAppLogo = "assets/logo/noon-logo.jpg";
+  static const icLock = "assets/icons/ic_lock.svg";
+  static const icCall = "assets/icons/ic_call.svg";
+  static const icVisibility = "assets/icons/ic_visibility.svg";
+  static const icUser = "assets/icons/ic_user.svg";
+  static const icProfile = "assets/icons/ic_profile.svg";
+  static const icProfileV2 = "assets/icons/ic_profile_v2.svg";
+  static const icAssignment = "assets/icons/ic_assignment.svg";
+  static const icAssignmentV2 = "assets/icons/ic_assignment_v2.svg";
+  static const icMain = "assets/icons/ic_main.svg";
+  static const icMainV2 = "assets/icons/ic_main_v2.svg";
+  static const icMainFull = "assets/icons/ic_main_full.svg";
+  static const icProfileFull = "assets/icons/ic_profile_full.svg";
+  static const icVisibilityOff = "assets/icons/ic_visibility_off.svg";
+  static const icNotification = "assets/icons/ic_notification.svg";
+  static const icNotificationNew = "assets/icons/ic_notification_new.svg";
+  static const icNotificationV2 = "assets/icons/ic_notification_v2.svg";
+  static const icImageNotFound = "assets/icons/ic_image_not_found.svg";
+  static const icMarks = "assets/icons/ic_marks.svg";
+  static const icMarksV2 = "assets/icons/ic_marks_v2.svg";
+  static const icTable = "assets/icons/ic_table.svg";
+  static const icTableV2 = "assets/icons/ic_table_v2.svg";
+  static const icAttendance = "assets/icons/ic_person_color.svg";
+  static const icAttendanceV2 = "assets/icons/ic_person_color_v2.svg";
+  static const icExamTable = "assets/icons/ic_exam_table.svg";
+  static const icExamTableV2 = "assets/icons/ic_exam_table_v2.svg";
+  static const icAqsate = "assets/icons/ic_aqsate.svg";
+  static const icAqsateV2 = "assets/icons/ic_aqsate_v2.svg";
+  static const icLines = "assets/icons/ic_line.svg";
+  static const icLinesV2 = "assets/icons/ic_line_v2.svg";
+  static const icInstructions = "assets/icons/ic_Instructions.svg";
+  static const icInstructionsV2 = "assets/icons/ic_Instructions_v2.svg";
+  static const icGallery = "assets/icons/ic_gallery.svg";
+  static const icGalleryV2 = "assets/icons/ic_gallery_v2.svg";
+  static const icLibrary = "assets/icons/ic_library.svg";
+  static const icLibraryV2 = "assets/icons/ic_library_v2.svg";
+  static const icTechGroup = "assets/icons/ic_tech_group.svg";
+  static const icTechGroupV2 = "assets/icons/ic_tech_group_v2.svg";
+  static const icBackCircle = "assets/icons/ic_back_circle.svg";
+  static const icLogout = "assets/icons/ic_logout.svg";
+  static const icEmpty = 'assets/icons/ic_empty.svg';
+  static const icEmptyV2 = 'assets/icons/ic_empty_v2.svg';
+  static const icNoInternet = 'assets/icons/ic_no_internet.svg';
+  static const icNoInternetV2 = 'assets/icons/ic_no_internet_v2.svg';
+  static const icAdd = 'assets/icons/ic_add.svg';
+  static const icAddPdfOrImg = 'assets/icons/ic_add_pdf.svg';
+  static const icSearch = 'assets/icons/ic_search.svg';
+  static const icHomework = 'assets/icons/ic_homework.svg';
+  static const icHomeworkV2 = 'assets/icons/ic_homework_v2.svg';
+  static const icComplaints = 'assets/icons/ic_complaints.svg';
+  static const icUpload = 'assets/icons/ic_upload.svg';
+  static const icDelete = 'assets/icons/ic_trash.svg';
+  static const icArrowLeft = 'assets/icons/ic_arrow_left.svg';
+  static const icArrowLeftV2 = 'assets/icons/ic_arrow_left_v2.svg';
+  static const icChat = 'assets/icons/ic_chat.svg';
+  static const icChatV2 = 'assets/icons/ic_chat_v2.svg';
+  static const icGroup = 'assets/icons/ic_group.svg';
+  static const icUsers = 'assets/icons/ic_users.svg';
+  static const icChatOutline = 'assets/icons/ic_chat_outline.svg';
+  static const icChatOutlineV2 = 'assets/icons/ic_chat_outline_v2.svg';
+  static const icChatOutlineV3 = 'assets/icons/ic_chat_outline_v3.svg';
+  static const appLogoImg = 'assets/logo/noon-logo.png';
+  static const appLogoImgJpg = 'assets/logo/noon-logo.jpg';
+  static const icCalendarWithInArrow =
+      'assets/icons/ic_calendar_with_in_arrow.svg';
+  static const icCalendarWithOutArrow =
+      'assets/icons/ic_calendar_with_out_arrow.svg';
+  static const icCalendar = 'assets/icons/ic_calendar.svg';
+  static const icCalendarV2 = 'assets/icons/ic_calendar_v2.svg';
+  static const icCalendarV3 = 'assets/icons/ic_calendar_v3.svg';
+  static const icDetails = 'assets/icons/ic_details.svg';
+  static const icLessons = 'assets/icons/ic_lessons.svg';
+  static const icClock = 'assets/icons/ic_clock.svg';
+  static const icUserV2 = 'assets/icons/ic_user_v2.svg';
+  static const icDone = 'assets/icons/ic_done.svg';
+  static const icWarning = 'assets/icons/ic_warning.svg';
+  static const icTimer = 'assets/icons/ic_timer.svg';
+  static const icSend = 'assets/icons/ic_send.svg';
+  static const icUpdateApp = 'assets/icons/ic_update_app.svg';
+  static const icExamProgressFlag = 'assets/icons/exam_progress_flag.svg';
+  static const icPdf = 'assets/icons/ic_pdf.svg';
+  // ? onboarding images
+  static const imagesSmartHomeContol = 'assets/images/smart-home-contol.svg';
+  static const imagesCoding = 'assets/images/coding.svg';
+  static const imagesGraduation = 'assets/images/graduation.svg';
+  static const icStudents = 'assets/icons/ic_students.svg';
+  static const icBehavior = 'assets/icons/behavior.svg';
+
+  // ? subjects
+  static const icArabic = 'assets/icons/arabic.svg';
+  static const icBiology = 'assets/icons/biology.svg';
+  static const icChemistry = 'assets/icons/chemistry.svg';
+  static const icEnglish = 'assets/icons/english.svg';
+  static const icFrench = 'assets/icons/french.png';
+  static const icKurdish = 'assets/icons/kurdish.png';
+  static const icMath = 'assets/icons/maths.svg';
+  static const icPhysics = 'assets/icons/physics.svg';
+  static const icSocialStudies = 'assets/icons/social_studies.svg';
+  static const icScience = 'assets/icons/science.png';
+  static const icIslamic = 'assets/icons/islamic.png';
+}

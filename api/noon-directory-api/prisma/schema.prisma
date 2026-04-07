@@ -1,0 +1,341 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ========================
+// Enums
+// ========================
+
+enum nd_Status {
+  TRUE
+  FALSE
+}
+
+enum nd_RoleType {
+  SuperAdmin
+  Admin
+  Vendor
+}
+
+enum nd_ListingCategory {
+  INSTITUTE
+  PHYSICAL_ACTIVITY
+  KINDERGARTEN
+  PRIVATE_SCHOOL
+  TEACHER
+  STATIONERY
+  LIBRARY
+  UNIFORM
+  SMART_TOYS
+  HEALTH_DENTAL
+  HEALTH_PEDIATRIC
+  HEALTH_SPECIALIST
+}
+
+enum nd_AdRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// ========================
+// Admin / Auth
+// ========================
+
+model NdAdmin {
+  id        String      @id @default(uuid())
+  username  String      @unique
+  hash      String
+  hashedRt  String?
+  photo     String?
+  roles     String      @default("[]")
+  isActive  nd_Status   @default(TRUE)
+  RoleType  nd_RoleType @default(SuperAdmin)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  DeviceTokens NdAdminDeviceToken[]
+
+  @@map("nd_admins")
+}
+
+model NdAdminDeviceToken {
+  id           String   @id @default(uuid())
+  client_token String   @unique
+  adminId      String
+  admin        NdAdmin  @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("nd_admin_device_tokens")
+}
+
+// ========================
+// API Key / Client
+// ========================
+
+model NdClient {
+  id        String   @id @default(uuid())
+  name      String
+  apiKey    String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("nd_clients")
+}
+
+// ========================
+// Vendor (Store owners, libraries, uniform shops, etc.)
+// ========================
+
+model NdVendor {
+  id         String    @id @default(uuid())
+  name       String
+  phone      String    @unique
+  email      String?
+  hash       String
+  hashedRt   String?
+  photo      String?
+  province   String?
+  address    String?   @db.Text
+  isActive   nd_Status @default(TRUE)
+  isVerified nd_Status @default(FALSE)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  Store    NdStore?
+  Products NdProduct[]
+
+  @@map("nd_vendors")
+}
+
+// ========================
+// Store (Vendor's store/shop)
+// ========================
+
+model NdStore {
+  id          String    @id @default(uuid())
+  name        String
+  description String?   @db.Text
+  logo        String?
+  cover       String?
+  phone       String?
+  phone2      String?
+  province    String
+  address     String?   @db.Text
+  isActive    nd_Status @default(TRUE)
+  vendorId    String    @unique
+  vendor      NdVendor  @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  Products NdProduct[]
+
+  @@map("nd_stores")
+}
+
+// ========================
+// Product (Items sold by vendors)
+// ========================
+
+model NdProduct {
+  id          String    @id @default(uuid())
+  name        String
+  description String?   @db.Text
+  price       Float?
+  image       String?
+  category    String?
+  isActive    nd_Status @default(TRUE)
+  vendorId    String
+  vendor      NdVendor  @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  storeId     String
+  store       NdStore   @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("nd_products")
+}
+
+// ========================
+// Directory Listing (Main directory entries)
+// ========================
+
+model NdDirectoryListing {
+  id          String             @id @default(uuid())
+  name        String
+  category    nd_ListingCategory
+  province    String
+  phone       String?
+  phone2      String?
+  email       String?
+  address     String?            @db.Text
+  description String?            @db.Text
+  logo        String?
+  website     String?
+  isActive    nd_Status          @default(TRUE)
+  isFeatured  nd_Status          @default(FALSE)
+  rating      Float              @default(5.0)
+  viewCount   Int                @default(0)
+  clickCount  Int                @default(0)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  images  NdDirectoryListingImage[]
+  reviews NdReview[]
+
+  @@map("nd_directory_listings")
+}
+
+model NdDirectoryListingImage {
+  id                 String             @id @default(uuid())
+  url                String
+  directoryListingId String
+  directoryListing   NdDirectoryListing @relation(fields: [directoryListingId], references: [id], onDelete: Cascade)
+  createdAt          DateTime           @default(now())
+
+  @@map("nd_directory_listing_images")
+}
+
+// ========================
+// Reviews & Ratings
+// ========================
+
+model NdReview {
+  id                 String             @id @default(uuid())
+  reviewerName       String
+  reviewerPhone      String?
+  rating             Float
+  comment            String?            @db.Text
+  isApproved         nd_Status          @default(FALSE)
+  directoryListingId String
+  directoryListing   NdDirectoryListing @relation(fields: [directoryListingId], references: [id], onDelete: Cascade)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  @@map("nd_reviews")
+}
+
+// ========================
+// Job Seekers (Teachers looking for work)
+// ========================
+
+model NdJobSeeker {
+  id         String             @id @default(uuid())
+  fullName   String
+  phone      String
+  email      String?
+  speciality String
+  province   String
+  experience String?            @db.Text
+  bio        String?            @db.Text
+  photo      String?
+  cv         String?
+  isActive   nd_Status          @default(TRUE)
+  isApproved nd_AdRequestStatus @default(PENDING)
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+
+  @@map("nd_job_seekers")
+}
+
+// ========================
+// Advertisement Requests ("Add your ad" feature)
+// ========================
+
+model NdAdRequest {
+  id          String             @id @default(uuid())
+  name        String
+  phone       String
+  category    nd_ListingCategory
+  province    String
+  description String?            @db.Text
+  logo        String?
+  address     String?            @db.Text
+  email       String?
+  website     String?
+  status      nd_AdRequestStatus @default(PENDING)
+  adminNote   String?            @db.Text
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  images NdAdRequestImage[]
+
+  @@map("nd_ad_requests")
+}
+
+model NdAdRequestImage {
+  id          String      @id @default(uuid())
+  url         String
+  adRequestId String
+  adRequest   NdAdRequest @relation(fields: [adRequestId], references: [id], onDelete: Cascade)
+  createdAt   DateTime    @default(now())
+
+  @@map("nd_ad_request_images")
+}
+
+// ========================
+// Banners (Homepage advertisements)
+// ========================
+
+model NdBanner {
+  id          String    @id @default(uuid())
+  title       String?
+  description String?
+  url         String
+  link        String?
+  priority    Int       @default(99999)
+  isActive    nd_Status @default(TRUE)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("nd_banners")
+}
+
+// ========================
+// App Settings
+// ========================
+
+model NdSetting {
+  id    String @id @default(uuid())
+  key   String @unique
+  value String @db.Text
+
+  @@map("nd_settings")
+}
+
+// ========================
+// Disclaimer
+// ========================
+
+model NdDisclaimer {
+  id        String   @id @default(uuid())
+  title     String
+  content   String   @db.LongText
+  isActive  nd_Status @default(TRUE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("nd_disclaimers")
+}
+
+// ========================
+// Notifications
+// ========================
+
+model NdNotification {
+  id        String    @id @default(uuid())
+  title     String
+  body      String    @db.Text
+  link      String?
+  isActive  nd_Status @default(TRUE)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("nd_notifications")
+}

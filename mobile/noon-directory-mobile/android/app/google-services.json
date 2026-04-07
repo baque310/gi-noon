@@ -1,0 +1,124 @@
+{
+  "project_info": {
+    "project_number": "486586508241",
+    "project_id": "noon-f0d05",
+    "storage_bucket": "noon-f0d05.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:486586508241:android:4f5130a5532752f4e4b6f0",
+        "android_client_info": {
+          "package_name": "com.alghadSchools.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCULf-X7PpZiLFQ2j9mVR79wk9d07Ot6CU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:486586508241:android:5c654924b9f3bdfee4b6f0",
+        "android_client_info": {
+          "package_name": "com.example.noon"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCULf-X7PpZiLFQ2j9mVR79wk9d07Ot6CU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:486586508241:android:358b0bf14e755ee5e4b6f0",
+        "android_client_info": {
+          "package_name": "h.noon.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCULf-X7PpZiLFQ2j9mVR79wk9d07Ot6CU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:486586508241:android:115128ac0f121cb1e4b6f0",
+        "android_client_info": {
+          "package_name": "me.almalak.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCULf-X7PpZiLFQ2j9mVR79wk9d07Ot6CU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:486586508241:android:1baa46a55c326dd3e4b6f0",
+        "android_client_info": {
+          "package_name": "me.almanahil.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCULf-X7PpZiLFQ2j9mVR79wk9d07Ot6CU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:486586508241:android:8eee3f23733bb819e4b6f0",
+        "android_client_info": {
+          "package_name": "me.einsteinSchool.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCULf-X7PpZiLFQ2j9mVR79wk9d07Ot6CU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
