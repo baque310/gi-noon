@@ -22,10 +22,12 @@ class _ListingDetailScreenState extends State<ListingDetailScreen> {
     _registerView();
   }
 
-  void _registerView() {
+  void _registerView() async {
     // Calling the endpoint to increment the view count quietly in background
     if (widget.item['id'] != null) {
-      ApiService().get(url: '${ApiUrls.directoryListingUrl}/${widget.item['id']}').catchError((_) => null);
+      try {
+        await ApiService().get(url: '${ApiUrls.directoryListingUrl}/${widget.item['id']}');
+      } catch (_) {}
     }
   }
 

@@ -39,17 +39,17 @@ class GuestHomeScreen extends GetView<GuestHomeController> {
                       const SizedBox(height: 24),
                       _buildBannersSlider(context),
                       const SizedBox(height: 24),
-                      _buildCategorySection(context, 'معاهد تقوية', 'نخبة الأساتذة لضمان تفوقك', 'INSTITUTE', controller.institutes, Icons.school, Colors.purple),
-                      _buildCategorySection(context, 'أنشطة بدنية', 'أندية ومراكز رياضية', 'PHYSICAL_ACTIVITY', controller.physicalActivities, Icons.sports_soccer, Colors.green),
-                      _buildCategorySection(context, 'رياض الأطفال', 'مؤسسات تعليمية للأطفال', 'KINDERGARTEN', controller.kindergartens, Icons.child_care, Colors.blue),
-                      _buildCategorySection(context, 'مدارس أهلية', 'أفضل المدارس في منطقتك', 'PRIVATE_SCHOOL', controller.privateSchools, Icons.account_balance, Colors.red),
-                      _buildCategorySection(context, 'أساتذة', 'أفضل الأساتذة للدروس الخصوصية', 'TEACHER', controller.teachers, Icons.person, Colors.indigo),
-                      _buildCategorySection(context, 'مكتبات', 'كتب ومراجع تعليمية', 'LIBRARY', controller.libraries, Icons.library_books, Colors.orange),
-                      _buildCategorySection(context, 'الزي المدرسي', 'محلات الزي المدرسي', 'UNIFORM', controller.uniforms, Icons.checkroom, Colors.teal),
-                      _buildCategorySection(context, 'ألعاب الذكاء', 'ألعاب تعليمية وذكاء', 'SMART_TOYS', controller.smartToys, Icons.extension, Colors.pink),
-                      _buildCategorySection(context, 'أطباء أسنان', 'أطباء أسنان الأطفال', 'HEALTH_DENTAL', controller.healthDental, Icons.medical_services, Colors.cyan),
-                      _buildCategorySection(context, 'دكاترة أطفال', 'أطباء بمختلف الاختصاصات', 'HEALTH_PEDIATRIC', controller.healthPediatric, Icons.local_hospital, Colors.amber),
-                      _buildCategorySection(context, 'أخصائيين', 'أخصائيين صحة', 'HEALTH_SPECIALIST', controller.healthSpecialist, Icons.health_and_safety, Colors.deepOrange),
+                      _buildCategorySection(context, 'معاهد تقوية', 'نخبة الأساتذة لضمان تفوقك', 'INSTITUTE', controller.filteredInstitutes, Icons.school, Colors.purple),
+                      _buildCategorySection(context, 'أنشطة بدنية', 'أندية ومراكز رياضية', 'PHYSICAL_ACTIVITY', controller.filteredPhysicalActivities, Icons.sports_soccer, Colors.green),
+                      _buildCategorySection(context, 'رياض الأطفال', 'مؤسسات تعليمية للأطفال', 'KINDERGARTEN', controller.filteredKindergartens, Icons.child_care, Colors.blue),
+                      _buildCategorySection(context, 'مدارس أهلية', 'أفضل المدارس في منطقتك', 'PRIVATE_SCHOOL', controller.filteredPrivateSchools, Icons.account_balance, Colors.red),
+                      _buildCategorySection(context, 'أساتذة', 'أفضل الأساتذة للدروس الخصوصية', 'TEACHER', controller.filteredTeachers, Icons.person, Colors.indigo),
+                      _buildCategorySection(context, 'مكتبات', 'كتب ومراجع تعليمية', 'LIBRARY', controller.filteredLibraries, Icons.library_books, Colors.orange),
+                      _buildCategorySection(context, 'الزي المدرسي', 'محلات الزي المدرسي', 'UNIFORM', controller.filteredUniforms, Icons.checkroom, Colors.teal),
+                      _buildCategorySection(context, 'ألعاب الذكاء', 'ألعاب تعليمية وذكاء', 'SMART_TOYS', controller.filteredSmartToys, Icons.extension, Colors.pink),
+                      _buildCategorySection(context, 'أطباء أسنان', 'أطباء أسنان الأطفال', 'HEALTH_DENTAL', controller.filteredHealthDental, Icons.medical_services, Colors.cyan),
+                      _buildCategorySection(context, 'دكاترة أطفال', 'أطباء بمختلف الاختصاصات', 'HEALTH_PEDIATRIC', controller.filteredHealthPediatric, Icons.local_hospital, Colors.amber),
+                      _buildCategorySection(context, 'أخصائيين', 'أخصائيين صحة', 'HEALTH_SPECIALIST', controller.filteredHealthSpecialist, Icons.health_and_safety, Colors.deepOrange),
                       const SizedBox(height: 40),
                     ],
                   ),
@@ -248,6 +248,7 @@ class GuestHomeScreen extends GetView<GuestHomeController> {
             prefixIcon: const Icon(Icons.search, color: AppColors.primary),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           ),
+          onChanged: (val) => controller.searchQuery.value = val,
         ),
       ),
     );
@@ -444,47 +445,45 @@ class GuestHomeScreen extends GetView<GuestHomeController> {
     );
   }
 
-  Widget _buildCategorySection(BuildContext context, String title, String subtitle, String categoryKey, RxList<dynamic> items, IconData categoryIcon, Color categoryColor) {
-    return Obx(() {
-      if (items.isEmpty) return const SizedBox.shrink();
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
+  Widget _buildCategorySection(BuildContext context, String title, String subtitle, String categoryKey, List<dynamic> items, IconData categoryIcon, Color categoryColor) {
+    if (items.isEmpty) return const SizedBox.shrink();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(title, style: AppTextStyles.bold18),
+                const SizedBox(height: 4),
+                Text(subtitle, style: AppTextStyles.regular12.copyWith(color: Colors.grey[600])),
+              ])),
+              GestureDetector(
+                onTap: () => _navigateToCategory(context, categoryKey, title),
+                child: Text('عرض الكل >', style: AppTextStyles.semiBold12.copyWith(color: AppColors.primary)),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 200,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(title, style: AppTextStyles.bold18),
-                  const SizedBox(height: 4),
-                  Text(subtitle, style: AppTextStyles.regular12.copyWith(color: Colors.grey[600])),
-                ])),
-                GestureDetector(
-                  onTap: () => _navigateToCategory(context, categoryKey, title),
-                  child: Text('عرض الكل >', style: AppTextStyles.semiBold12.copyWith(color: AppColors.primary)),
-                ),
-              ],
-            ),
+            itemCount: items.length > 5 ? 5 : items.length,
+            itemBuilder: (context, index) {
+              final item = items[index];
+              return _buildSmallCard(context, item, categoryColor);
+            },
           ),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 200,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: items.length > 5 ? 5 : items.length,
-              itemBuilder: (context, index) {
-                final item = items[index];
-                return _buildSmallCard(context, item, categoryColor);
-              },
-            ),
-          ),
-          const SizedBox(height: 16),
-        ],
-      );
-    });
+        ),
+        const SizedBox(height: 16),
+      ],
+    );
   }
 
   Widget _buildSmallCard(BuildContext context, dynamic item, Color accentColor) {

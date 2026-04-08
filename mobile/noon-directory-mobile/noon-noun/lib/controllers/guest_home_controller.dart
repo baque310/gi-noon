@@ -27,6 +27,8 @@ class GuestHomeController extends GetxController {
   RxString selectedProvince = ''.obs;
   RxInt unreadNotificationsCount = 0.obs;
   RxMap<String, int> clearedCategoryBadges = <String, int>{}.obs;
+  
+  RxString searchQuery = ''.obs;
 
   static const List<String> provinces = [
     'بغداد - الرصافة',
@@ -164,19 +166,41 @@ class GuestHomeController extends GetxController {
     }
   }
 
+  bool _matchesSearch(dynamic item) {
+    if (searchQuery.value.trim().isEmpty) return true;
+    final query = searchQuery.value.trim().toLowerCase();
+    
+    final name = (item['name'] ?? '').toString().toLowerCase();
+    final description = (item['description'] ?? '').toString().toLowerCase();
+    
+    return name.contains(query) || description.contains(query);
+  }
+
+  List<dynamic> get filteredInstitutes => institutes.where(_matchesSearch).toList();
+  List<dynamic> get filteredPhysicalActivities => physicalActivities.where(_matchesSearch).toList();
+  List<dynamic> get filteredPrivateSchools => privateSchools.where(_matchesSearch).toList();
+  List<dynamic> get filteredKindergartens => kindergartens.where(_matchesSearch).toList();
+  List<dynamic> get filteredLibraries => libraries.where(_matchesSearch).toList();
+  List<dynamic> get filteredUniforms => uniforms.where(_matchesSearch).toList();
+  List<dynamic> get filteredTeachers => teachers.where(_matchesSearch).toList();
+  List<dynamic> get filteredSmartToys => smartToys.where(_matchesSearch).toList();
+  List<dynamic> get filteredHealthDental => healthDental.where(_matchesSearch).toList();
+  List<dynamic> get filteredHealthPediatric => healthPediatric.where(_matchesSearch).toList();
+  List<dynamic> get filteredHealthSpecialist => healthSpecialist.where(_matchesSearch).toList();
+
   List<dynamic> getItemsByCategory(String categoryKey) {
     switch (categoryKey) {
-      case 'INSTITUTE': return institutes.toList();
-      case 'PHYSICAL_ACTIVITY': return physicalActivities.toList();
-      case 'PRIVATE_SCHOOL': return privateSchools.toList();
-      case 'KINDERGARTEN': return kindergartens.toList();
-      case 'LIBRARY': return libraries.toList();
-      case 'UNIFORM': return uniforms.toList();
-      case 'TEACHER': return teachers.toList();
-      case 'SMART_TOYS': return smartToys.toList();
-      case 'HEALTH_DENTAL': return healthDental.toList();
-      case 'HEALTH_PEDIATRIC': return healthPediatric.toList();
-      case 'HEALTH_SPECIALIST': return healthSpecialist.toList();
+      case 'INSTITUTE': return filteredInstitutes;
+      case 'PHYSICAL_ACTIVITY': return filteredPhysicalActivities;
+      case 'PRIVATE_SCHOOL': return filteredPrivateSchools;
+      case 'KINDERGARTEN': return filteredKindergartens;
+      case 'LIBRARY': return filteredLibraries;
+      case 'UNIFORM': return filteredUniforms;
+      case 'TEACHER': return filteredTeachers;
+      case 'SMART_TOYS': return filteredSmartToys;
+      case 'HEALTH_DENTAL': return filteredHealthDental;
+      case 'HEALTH_PEDIATRIC': return filteredHealthPediatric;
+      case 'HEALTH_SPECIALIST': return filteredHealthSpecialist;
       default: return [];
     }
   }
