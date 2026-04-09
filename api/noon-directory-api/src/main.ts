@@ -91,7 +91,7 @@ async function bootstrap() {
   );
 
   app.enableShutdownHooks();
-  await app.listen(process.env.PORT || 3003, process.env.HOST || '0.0.0.0');
+  await app.listen(process.env.PORT || 3040, process.env.HOST || '0.0.0.0');
   console.log(`🚀 Noon Directory API is running on: ${await app.getUrl()}`);
   console.log(`📋 Dashboard served at: ${await app.getUrl()}/dashboard`);
   console.log(`📖 API Docs at: ${await app.getUrl()}/api/api-docs`);
