@@ -2,7 +2,7 @@ import 'package:get/get_navigation/get_navigation.dart';
 import 'package:noon/bindings.dart';
 import 'package:noon/core/constant/screens_urls.dart';
 import 'package:noon/view/screen/splash_screen.dart';
-import 'package:noon/view/screen/guest_home_screen.dart';
+import 'package:noon/view/screen/main_nav_screen.dart';
 import 'package:noon/view/screen/notifications_screen.dart';
 
 List<GetPage<dynamic>>? routes = [
@@ -14,7 +14,7 @@ List<GetPage<dynamic>>? routes = [
   ),
   GetPage(
     name: ScreensUrls.guestHomeUrl,
-    page: () => const GuestHomeScreen(),
+    page: () => const MainNavScreen(),
     binding: GuestHomeBinding(),
   ),
   GetPage(

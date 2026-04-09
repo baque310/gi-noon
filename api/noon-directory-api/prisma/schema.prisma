@@ -280,6 +280,30 @@ model NdAdRequestImage {
 }
 
 // ========================
+// Job Offers (Posted by schools/institutes looking for staff)
+// ========================
+
+model NdJobOffer {
+  id              String             @id @default(uuid())
+  companyName     String
+  companyLogo     String?
+  jobTitle        String
+  category        nd_ListingCategory
+  province        String
+  description     String?            @db.Text
+  requirements    String?            @db.Text
+  salaryRange     String?
+  contactPhone    String?
+  contactEmail    String?
+  isActive        nd_Status          @default(TRUE)
+  isApproved      nd_AdRequestStatus @default(PENDING)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  @@map("nd_job_offers")
+}
+
+// ========================
 // Banners (Homepage advertisements)
 // ========================
 
@@ -290,6 +314,7 @@ model NdBanner {
   url         String
   link        String?
   priority    Int       @default(99999)
+  isVertical  Boolean   @default(false)
   isActive    nd_Status @default(TRUE)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt

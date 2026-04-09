@@ -8,6 +8,8 @@ import 'package:noon/core/print_value.dart';
 class GuestHomeController extends GetxController {
   RxBool isLoading = true.obs;
   RxList<dynamic> banners = <dynamic>[].obs;
+  RxList<dynamic> horizontalBanners = <dynamic>[].obs;
+  RxList<dynamic> verticalBanners = <dynamic>[].obs;
   RxInt currentBannerIndex = 0.obs;
 
   // Directory Listing categories
@@ -126,6 +128,8 @@ class GuestHomeController extends GetxController {
       if (response.statusCode == 200 && response.data != null) {
         if (response.data is List) {
           banners.value = response.data;
+          horizontalBanners.assignAll(banners.where((b) => b['isVertical'] != true).toList());
+          verticalBanners.assignAll(banners.where((b) => b['isVertical'] == true).toList());
         }
       }
     } catch (e) {

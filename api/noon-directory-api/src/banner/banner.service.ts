@@ -9,7 +9,12 @@ export class BannerService {
 
   async create(data: any, filename: string) {
     return this.prismaService.ndBanner.create({
-      data: { ...data, url: filename, priority: data.priority ? parseInt(data.priority) : 99999 },
+      data: { 
+        ...data, 
+        url: filename, 
+        priority: data.priority ? parseInt(data.priority) : 99999,
+        isVertical: data.isVertical === 'true' || data.isVertical === true
+      },
     });
   }
 

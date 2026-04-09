@@ -17,6 +17,7 @@ import { DirectoryListingModule } from './directory-listing/directory-listing.mo
 import { BannerModule } from './banner/banner.module';
 import { AdRequestModule } from './ad-request/ad-request.module';
 import { JobSeekerModule } from './job-seeker/job-seeker.module';
+import { JobOfferModule } from './job-offer/job-offer.module';
 import { NotificationsModule } from './notifications/notifications.module';
 
 // Guards & Filters
@@ -32,7 +33,7 @@ dotenv.config();
   imports: [
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'uploads'),
-      serveRoot: '/uploads',
+      serveRoot: '/api/uploads',
       exclude: ['/(.*)'],
       serveStaticOptions: { index: false },
     }),
@@ -50,6 +51,7 @@ dotenv.config();
     BannerModule,
     AdRequestModule,
     JobSeekerModule,
+    JobOfferModule,
     NotificationsModule,
   ],
   providers: [

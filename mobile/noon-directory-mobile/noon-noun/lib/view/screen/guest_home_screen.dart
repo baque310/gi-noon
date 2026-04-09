@@ -42,6 +42,9 @@ class GuestHomeScreen extends GetView<GuestHomeController> {
                       _buildCategorySection(context, 'معاهد تقوية', 'نخبة الأساتذة لضمان تفوقك', 'INSTITUTE', controller.filteredInstitutes, Icons.school, Colors.purple),
                       _buildCategorySection(context, 'أنشطة بدنية', 'أندية ومراكز رياضية', 'PHYSICAL_ACTIVITY', controller.filteredPhysicalActivities, Icons.sports_soccer, Colors.green),
                       _buildCategorySection(context, 'رياض الأطفال', 'مؤسسات تعليمية للأطفال', 'KINDERGARTEN', controller.filteredKindergartens, Icons.child_care, Colors.blue),
+                      const SizedBox(height: 16),
+                      _buildVerticalBannersSlider(context, title: 'إعلانات مميزة 🌟'),
+                      const SizedBox(height: 24),
                       _buildCategorySection(context, 'مدارس أهلية', 'أفضل المدارس في منطقتك', 'PRIVATE_SCHOOL', controller.filteredPrivateSchools, Icons.account_balance, Colors.red),
                       _buildCategorySection(context, 'أساتذة', 'أفضل الأساتذة للدروس الخصوصية', 'TEACHER', controller.filteredTeachers, Icons.person, Colors.indigo),
                       _buildCategorySection(context, 'مكتبات', 'كتب ومراجع تعليمية', 'LIBRARY', controller.filteredLibraries, Icons.library_books, Colors.orange),
@@ -255,7 +258,7 @@ class GuestHomeScreen extends GetView<GuestHomeController> {
   }
 
   Widget _buildBannersSlider(BuildContext context) {
-    if (controller.banners.isEmpty) return const SizedBox.shrink();
+    if (controller.horizontalBanners.isEmpty) return const SizedBox.shrink();
 
     return Column(
       children: [
@@ -263,25 +266,159 @@ class GuestHomeScreen extends GetView<GuestHomeController> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: CarouselSlider(
             options: CarouselOptions(
-              height: 180,
+              height: 280,
               autoPlay: true,
+              autoPlayInterval: const Duration(seconds: 5),
               enlargeCenterPage: true,
               viewportFraction: 1.0,
-              aspectRatio: 16 / 9,
               onPageChanged: (index, reason) {
                 controller.currentBannerIndex.value = index;
               },
             ),
-            items: controller.banners.map((banner) {
+            items: controller.horizontalBanners.map((banner) {
               final imageUrl = banner['url'] != null ? '${ApiUrls.filesUrl}/${banner['url']}' : '';
+              final String bannerTitle = banner['title'] ?? '';
+              final String bannerDesc = banner['description'] ?? '';
+              final String bannerLocation = banner['link'] ?? '';
+
               return GestureDetector(
-                onTap: () => _showFullImage(context, imageUrl),
+                onTap: () {
+                  if (imageUrl.isNotEmpty) _showFullImage(context, imageUrl);
+                },
                 child: Container(
                   width: double.infinity,
+                  margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
                   decoration: BoxDecoration(
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
-                    image: DecorationImage(image: NetworkImage(imageUrl), fit: BoxFit.cover),
                     boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 5))],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Top Image Part
+                      Expanded(
+                        child: Stack(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                                image: DecorationImage(image: NetworkImage(imageUrl), fit: BoxFit.cover),
+                                color: Colors.grey.shade200,
+                              ),
+                            ),
+                            // Heart Icon
+                            Positioned(
+                              top: 12,
+                              left: 12,
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withValues(alpha: 0.5),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(Icons.favorite_border, color: Colors.white, size: 20),
+                              ),
+                            ),
+                            // Verified Badge
+                            Positioned(
+                              top: 12,
+                              right: 12,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.9),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.verified, color: Colors.grey, size: 14),
+                                    const SizedBox(width: 4),
+                                    Text('تم التحقق', style: AppTextStyles.semiBold10.copyWith(color: Colors.grey.shade700)),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Bottom Text Part
+                      if (bannerTitle.isNotEmpty || bannerDesc.isNotEmpty || bannerLocation.isNotEmpty)
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Fake views count
+                              Row(
+                                children: [
+                                  const Icon(Icons.remove_red_eye_outlined, size: 16, color: Colors.grey),
+                                  const SizedBox(width: 4),
+                                  Text('1.2k عرض', style: AppTextStyles.regular12.copyWith(color: Colors.grey)),
+                                ],
+                              ),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    if (bannerTitle.isNotEmpty)
+                                      Text(
+                                        bannerTitle,
+                                        style: AppTextStyles.bold16.copyWith(color: Colors.black87),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        textAlign: TextAlign.right,
+                                      ),
+                                    if (bannerDesc.isNotEmpty) ...[
+                                      const SizedBox(height: 6),
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              bannerDesc,
+                                              style: AppTextStyles.semiBold12.copyWith(color: Colors.grey.shade600),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              textAlign: TextAlign.right,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Icon(Icons.layers_outlined, size: 14, color: Colors.grey.shade600),
+                                        ],
+                                      ),
+                                    ],
+                                    if (bannerLocation.isNotEmpty) ...[
+                                      const SizedBox(height: 6),
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              bannerLocation,
+                                              style: AppTextStyles.semiBold12.copyWith(color: Colors.grey.shade600),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              textAlign: TextAlign.right,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Icon(Icons.location_on_outlined, size: 14, color: Colors.grey.shade600),
+                                        ],
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               );
@@ -292,7 +429,7 @@ class GuestHomeScreen extends GetView<GuestHomeController> {
         Obx(
           () => Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: controller.banners.asMap().entries.map((entry) {
+            children: controller.horizontalBanners.asMap().entries.map((entry) {
               return Container(
                 width: controller.currentBannerIndex.value == entry.key ? 24.0 : 8.0,
                 height: 8.0,
@@ -515,7 +652,7 @@ class GuestHomeScreen extends GetView<GuestHomeController> {
             Padding(
               padding: const EdgeInsets.all(10),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+               crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(item['name'] ?? '', style: AppTextStyles.semiBold12, maxLines: 1, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 4),
@@ -533,4 +670,177 @@ class GuestHomeScreen extends GetView<GuestHomeController> {
       ),
     );
   }
+
+  Widget _buildVerticalBannersSlider(BuildContext context, {required String title, bool reversed = false}) {
+    if (controller.verticalBanners.isEmpty) return const SizedBox.shrink();
+
+    final ads = reversed ? controller.verticalBanners.reversed.toList() : controller.verticalBanners.toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Text(title, style: AppTextStyles.bold18),
+        ),
+        const SizedBox(height: 12),
+        CarouselSlider(
+          options: CarouselOptions(
+            height: 380, // Taller vertical height for the card
+            autoPlay: true,
+            autoPlayInterval: const Duration(seconds: 5),
+            enlargeCenterPage: true,
+            viewportFraction: 0.75, // Show mostly one card, hint of the next
+            aspectRatio: 3 / 4, 
+          ),
+          items: ads.map((banner) {
+            final imageUrl = banner['url'] != null ? '${ApiUrls.filesUrl}/${banner['url']}' : '';
+            final String bannerTitle = banner['title'] ?? '';
+            final String bannerDesc = banner['description'] ?? '';
+            final String bannerLocation = banner['link'] ?? '';
+
+            return GestureDetector(
+              onTap: () => _showFullImage(context, imageUrl),
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.white,
+                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 5))],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Top Image Part
+                    Expanded(
+                      child: Stack(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                              image: DecorationImage(image: NetworkImage(imageUrl), fit: BoxFit.cover),
+                              color: Colors.grey.shade200,
+                            ),
+                          ),
+                          // Heart Icon
+                          Positioned(
+                            top: 12,
+                            left: 12,
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.5),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.favorite_border, color: Colors.white, size: 20),
+                            ),
+                          ),
+                          // Verified Badge
+                          Positioned(
+                            top: 12,
+                            right: 12,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.9),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.verified, color: Colors.grey, size: 14),
+                                  const SizedBox(width: 4),
+                                  Text('تم التحقق', style: AppTextStyles.semiBold10.copyWith(color: Colors.grey.shade700)),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Bottom Text Part
+                    if (bannerTitle.isNotEmpty || bannerDesc.isNotEmpty || bannerLocation.isNotEmpty)
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Fake views count
+                            Row(
+                              children: [
+                                const Icon(Icons.remove_red_eye_outlined, size: 16, color: Colors.grey),
+                                const SizedBox(width: 4),
+                                Text('1.2k عرض', style: AppTextStyles.regular12.copyWith(color: Colors.grey)),
+                              ],
+                            ),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  if (bannerTitle.isNotEmpty)
+                                    Text(
+                                      bannerTitle,
+                                      style: AppTextStyles.bold16.copyWith(color: Colors.black87),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.right,
+                                    ),
+                                  if (bannerDesc.isNotEmpty) ...[
+                                    const SizedBox(height: 6),
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            bannerDesc,
+                                            style: AppTextStyles.semiBold12.copyWith(color: Colors.grey.shade600),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            textAlign: TextAlign.right,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Icon(Icons.layers_outlined, size: 14, color: Colors.grey.shade600),
+                                      ],
+                                    ),
+                                  ],
+                                  if (bannerLocation.isNotEmpty) ...[
+                                    const SizedBox(height: 6),
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            bannerLocation,
+                                            style: AppTextStyles.semiBold12.copyWith(color: Colors.grey.shade600),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            textAlign: TextAlign.right,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Icon(Icons.location_on_outlined, size: 14, color: Colors.grey.shade600),
+                                      ],
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
 }
+
