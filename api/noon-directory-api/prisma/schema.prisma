@@ -323,6 +323,28 @@ model NdBanner {
 }
 
 // ========================
+// Stories (Short video ads)
+// ========================
+
+model NdStory {
+  id             String    @id @default(uuid())
+  title          String
+  advertiserName String?
+  thumbnail      String
+  videoUrl       String
+  duration       Int?      @default(15)
+  priority       Int       @default(99999)
+  link           String?
+  isActive       nd_Status @default(TRUE)
+  expiresAt      DateTime?
+  viewCount      Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@map("nd_stories")
+}
+
+// ========================
 // App Settings
 // ========================
 

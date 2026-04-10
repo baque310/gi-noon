@@ -1,10 +1,10 @@
 class ApiUrls {
   // static const baseUrl = 'https://api.noon-iraq.com';
   // static const baseUrl = 'https://wl-v1-dev-api.noon-iraq.com';
-  static const baseUrl = 'http://10.0.2.2:3002'; // For Android Emulator loopback
+  static const baseUrl = 'https://noon-directory-api.onrender.com/api';
   // static const baseUrl = 'http://192.168.0.178:3002'; // Local API (WiFi)
 
-  static const String apiKey = '728b2e74f6b7ceebe2ff91ff6a32fc6d169a51ccf063074190a206bc09634c7d';
+  static const String apiKey = 'noon_directory_api_key_2024_secure';
   
   static const homeUrl = '$baseUrl/home';
   static const notificationUrl = '$baseUrl/notification/forUser';

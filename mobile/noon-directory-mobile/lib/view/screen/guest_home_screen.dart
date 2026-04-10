@@ -7,6 +7,7 @@ import 'package:noon/core/constant/app_colors.dart';
 import 'package:noon/core/constant/app_text_style.dart';
 import 'package:noon/view/screen/category_listings_screen.dart';
 import 'package:noon/view/screen/listing_detail_screen.dart';
+import 'package:noon/view/screen/story_viewer_screen.dart';
 
 class GuestHomeScreen extends GetView<GuestHomeController> {
   const GuestHomeScreen({super.key});
@@ -32,6 +33,8 @@ class GuestHomeScreen extends GetView<GuestHomeController> {
                       Obx(() => _buildCategoriesGrid(context)),
                       const SizedBox(height: 24),
                       _buildBannersSlider(context),
+                      const SizedBox(height: 16),
+                      _buildStoriesStrip(context),
                       const SizedBox(height: 24),
                       _buildCategorySection(
                         context,
@@ -347,6 +350,110 @@ class GuestHomeScreen extends GetView<GuestHomeController> {
         ),
       ),
     );
+  }
+
+  Widget _buildStoriesStrip(BuildContext context) {
+    return Obx(() {
+      if (controller.stories.isEmpty) return const SizedBox.shrink();
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text('ستوريات إعلانية', style: AppTextStyles.bold16),
+          ),
+          const SizedBox(height: 10),
+          SizedBox(
+            height: 140,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              itemCount: controller.stories.length,
+              itemBuilder: (context, index) {
+                final story = controller.stories[index];
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => StoryViewerScreen(
+                          stories: controller.stories.toList(),
+                          initialIndex: index,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    width: 110,
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 100,
+                          height: 100,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFFE040FB), Color(0xFF7C4DFF), Color(0xFF536DFE)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.purple.withValues(alpha: 0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          padding: const EdgeInsets.all(2.5),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(14),
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                Image.network(
+                                  story['thumbnail'] ?? '',
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => Container(
+                                    color: Colors.grey.shade200,
+                                    child: const Icon(Icons.play_circle_fill, size: 36, color: Colors.grey),
+                                  ),
+                                ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [Colors.black.withValues(alpha: 0.0), Colors.black.withValues(alpha: 0.4)],
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                    ),
+                                  ),
+                                ),
+                                const Center(
+                                  child: Icon(Icons.play_circle_fill, color: Colors.white, size: 30),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          story['advertiserName'] ?? story['title'] ?? '',
+                          style: AppTextStyles.semiBold10,
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      );
+    });
   }
 
   Widget _buildCategoriesGrid(BuildContext context) {

@@ -1,9 +1,7 @@
 const bcrypt = require('bcrypt');
 const { PrismaClient } = require('@prisma/client');
 
-const prisma = new PrismaClient({
-  datasources: { db: { url: 'mysql://mustafa:1234@localhost:3306/template_db' } },
-});
+const prisma = new PrismaClient();
 
 async function main() {
   const salt = await bcrypt.genSalt();

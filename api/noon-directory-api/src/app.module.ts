@@ -19,6 +19,7 @@ import { AdRequestModule } from './ad-request/ad-request.module';
 import { JobSeekerModule } from './job-seeker/job-seeker.module';
 import { JobOfferModule } from './job-offer/job-offer.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { StoryModule } from './story/story.module';
 
 // Guards & Filters
 import { ApiKeyGuard, AtGuard } from './auth/common/guards';
@@ -53,6 +54,7 @@ dotenv.config();
     JobSeekerModule,
     JobOfferModule,
     NotificationsModule,
+    StoryModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ApiKeyGuard },

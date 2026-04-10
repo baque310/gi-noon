@@ -21,7 +21,7 @@ export const multerConfig = {
     },
   }),
   fileFilter: (req: any, file: any, cb: any) => {
-    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.pdf', '.svg'];
+    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.pdf', '.svg', '.mp4', '.mov', '.webm'];
     const ext = extname(file.originalname).toLowerCase();
     if (!allowedExtensions.includes(ext)) {
       return cb(new Error('Only image or pdf files are allowed!'), false);
