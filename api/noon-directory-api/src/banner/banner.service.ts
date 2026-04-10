@@ -46,4 +46,11 @@ export class BannerService {
     await this.prismaService.ndBanner.delete({ where: { id } });
     return { success: true, message: 'Banner deleted' };
   }
+
+  async incrementViewCount(id: string) {
+    return this.prismaService.ndBanner.update({
+      where: { id },
+      data: { viewCount: { increment: 1 } },
+    });
+  }
 }

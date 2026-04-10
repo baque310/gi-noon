@@ -1,6 +1,6 @@
 class ApiUrls {
   // ===== دليل نون API =====
-  static const baseUrl = 'http://guide.noon-iraq.com/api'; // Production
+  static const baseUrl = 'https://noon-directory-api.onrender.com/api'; // Production
   // static const baseUrl = 'http://10.0.2.2:3003'; // For Android Emulator loopback
   // static const baseUrl = 'http://10.185.64.163:3003'; // Local API (WiFi)
 

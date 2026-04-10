@@ -25,6 +25,7 @@ dependencies:
   s_extensions: ^1.12.1
   flutter_svg: ^2.2.3
   iconsax: ^0.0.8
+  video_player: ^2.11.1
 
 dev_dependencies:
   flutter_test:

@@ -38,4 +38,8 @@ export class BannerPublicController {
   @Get()
   @Public()
   findAllActive() { return this.service.findAllActive(); }
+
+  @Post(':id/view')
+  @Public()
+  incrementView(@Param('id') id: string) { return this.service.incrementViewCount(id); }
 }

@@ -12,7 +12,6 @@ class GuestHomeController extends GetxController {
   RxBool isLoading = true.obs;
   RxList<dynamic> banners = <dynamic>[].obs;
   RxInt currentBannerIndex = 0.obs;
-  RxList<dynamic> stories = <dynamic>[].obs;
 
   // Directory Listing categories (from new API)
   RxList<dynamic> institutes = <dynamic>[].obs;
@@ -74,24 +73,6 @@ class GuestHomeController extends GetxController {
         }
       } catch (e) {
         dprint('Banner fetch error: $e');
-      }
-
-      // Fetch stories
-      try {
-        final storyResponse = await ApiService().get(
-          url: '${ApiUrls.baseUrl}/public/story',
-        );
-        if (storyResponse.statusCode == 200 && storyResponse.data != null) {
-          stories.value = (storyResponse.data as List).map((s) {
-            return {
-              ...s,
-              'thumbnail': '${ApiUrls.filesUrl}/${s['thumbnail']}',
-              'videoUrl': '${ApiUrls.filesUrl}/${s['videoUrl']}',
-            };
-          }).toList();
-        }
-      } catch (e) {
-        dprint('Stories fetch error: $e');
       }
 
       // Fetch directory listings from new API

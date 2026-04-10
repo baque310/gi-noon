@@ -7,6 +7,7 @@ import 'package:noon/core/constant/app_colors.dart';
 import 'package:noon/core/constant/app_text_style.dart';
 import 'package:noon/view/screen/category_listings_screen.dart';
 import 'package:noon/view/screen/listing_detail_screen.dart';
+import 'package:noon/view/screen/story_video_screen.dart';
 import 'package:noon/core/constant/screens_urls.dart';
 
 class GuestHomeScreen extends GetView<GuestHomeController> {
@@ -34,7 +35,9 @@ class GuestHomeScreen extends GetView<GuestHomeController> {
                     children: [
                       _buildProvinceSelector(context),
                       _buildSearchBar(),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 16),
+                      Obx(() => _buildStoriesList(context)),
+                      const SizedBox(height: 16),
                       Obx(() => _buildCategoriesGrid(context)),
                       const SizedBox(height: 24),
                       _buildBannersSlider(context),
@@ -257,6 +260,190 @@ class GuestHomeScreen extends GetView<GuestHomeController> {
     );
   }
 
+  Widget _buildBannerCard(BuildContext context, dynamic banner) {
+    final imageUrl = banner['url'] != null ? '${ApiUrls.filesUrl}/${banner['url']}' : '';
+    final String bannerTitle = banner['title'] ?? '';
+    final String bannerDesc = banner['description'] ?? '';
+    final String bannerLocation = banner['link'] ?? '';
+    final String bannerId = banner['id']?.toString() ?? '';
+    final viewCount = banner['viewCount'] ?? 0;
+
+    return GestureDetector(
+      onTap: () {
+        if (imageUrl.isNotEmpty) {
+          if (bannerId.isNotEmpty) controller.incrementBannerViewCount(bannerId);
+          _showFullScreenImage(context, imageUrl);
+        }
+      },
+      child: Container(
+        width: double.infinity,
+        margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 5))],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Top Image Part
+            Expanded(
+              child: Stack(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                      image: imageUrl.isNotEmpty ? DecorationImage(image: NetworkImage(imageUrl), fit: BoxFit.cover) : null,
+                      color: Colors.grey.shade200,
+                    ),
+                  ),
+                  // Like Button (thumbs up)
+                  Positioned(
+                    top: 12,
+                    left: 12,
+                    child: Obx(() {
+                      final isLiked = controller.isBannerLiked(bannerId);
+                      return GestureDetector(
+                        onTap: () => controller.toggleLike(bannerId),
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.5),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            isLiked ? Icons.thumb_up : Icons.thumb_up_outlined,
+                            color: isLiked ? Colors.blue : Colors.white,
+                            size: 20,
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                ],
+              ),
+            ),
+            // Bottom Text Part
+            if (bannerTitle.isNotEmpty || bannerDesc.isNotEmpty || bannerLocation.isNotEmpty)
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Title, description, location (right side in RTL)
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (bannerTitle.isNotEmpty)
+                            Text(
+                              bannerTitle,
+                              style: AppTextStyles.bold16.copyWith(color: Colors.black87),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.right,
+                            ),
+                          if (bannerDesc.isNotEmpty) ...[
+                            const SizedBox(height: 6),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.layers_outlined, size: 14, color: Colors.grey.shade600),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    bannerDesc,
+                                    style: AppTextStyles.semiBold12.copyWith(color: Colors.grey.shade600),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    textAlign: TextAlign.right,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                          if (bannerLocation.isNotEmpty) ...[
+                            const SizedBox(height: 6),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.location_on_outlined, size: 14, color: Colors.grey.shade600),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    bannerLocation,
+                                    style: AppTextStyles.semiBold12.copyWith(color: Colors.grey.shade600),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    textAlign: TextAlign.right,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    // Views count (left side in RTL)
+                    Obx(() {
+                      final currentBanner = controller.banners.firstWhere(
+                        (b) => b['id']?.toString() == bannerId,
+                        orElse: () => banner,
+                      );
+                      final currentViews = currentBanner['viewCount'] ?? viewCount;
+                      return Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.remove_red_eye_outlined, size: 16, color: Colors.grey),
+                          const SizedBox(width: 4),
+                          Text('${controller.formatViewCount(currentViews)}', style: AppTextStyles.regular12.copyWith(color: Colors.grey)),
+                        ],
+                      );
+                    }),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Full-screen image viewer with pinch-to-zoom
+  void _showFullScreenImage(BuildContext context, String imageUrl) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Scaffold(
+          backgroundColor: Colors.black,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            iconTheme: const IconThemeData(color: Colors.white),
+          ),
+          extendBodyBehindAppBar: true,
+          body: Center(
+            child: InteractiveViewer(
+              minScale: 0.5,
+              maxScale: 4.0,
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.contain,
+                width: double.infinity,
+                height: double.infinity,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildBannersSlider(BuildContext context) {
     if (controller.horizontalBanners.isEmpty) return const SizedBox.shrink();
 
@@ -276,152 +463,7 @@ class GuestHomeScreen extends GetView<GuestHomeController> {
               },
             ),
             items: controller.horizontalBanners.map((banner) {
-              final imageUrl = banner['url'] != null ? '${ApiUrls.filesUrl}/${banner['url']}' : '';
-              final String bannerTitle = banner['title'] ?? '';
-              final String bannerDesc = banner['description'] ?? '';
-              final String bannerLocation = banner['link'] ?? '';
-
-              return GestureDetector(
-                onTap: () {
-                  if (imageUrl.isNotEmpty) _showFullImage(context, imageUrl);
-                },
-                child: Container(
-                  width: double.infinity,
-                  margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 5))],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // Top Image Part
-                      Expanded(
-                        child: Stack(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                                image: DecorationImage(image: NetworkImage(imageUrl), fit: BoxFit.cover),
-                                color: Colors.grey.shade200,
-                              ),
-                            ),
-                            // Heart Icon
-                            Positioned(
-                              top: 12,
-                              left: 12,
-                              child: Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withValues(alpha: 0.5),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(Icons.favorite_border, color: Colors.white, size: 20),
-                              ),
-                            ),
-                            // Verified Badge
-                            Positioned(
-                              top: 12,
-                              right: 12,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.9),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.verified, color: Colors.grey, size: 14),
-                                    const SizedBox(width: 4),
-                                    Text('تم التحقق', style: AppTextStyles.semiBold10.copyWith(color: Colors.grey.shade700)),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Bottom Text Part
-                      if (bannerTitle.isNotEmpty || bannerDesc.isNotEmpty || bannerLocation.isNotEmpty)
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Fake views count
-                              Row(
-                                children: [
-                                  const Icon(Icons.remove_red_eye_outlined, size: 16, color: Colors.grey),
-                                  const SizedBox(width: 4),
-                                  Text('1.2k عرض', style: AppTextStyles.regular12.copyWith(color: Colors.grey)),
-                                ],
-                              ),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    if (bannerTitle.isNotEmpty)
-                                      Text(
-                                        bannerTitle,
-                                        style: AppTextStyles.bold16.copyWith(color: Colors.black87),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        textAlign: TextAlign.right,
-                                      ),
-                                    if (bannerDesc.isNotEmpty) ...[
-                                      const SizedBox(height: 6),
-                                      Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              bannerDesc,
-                                              style: AppTextStyles.semiBold12.copyWith(color: Colors.grey.shade600),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              textAlign: TextAlign.right,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Icon(Icons.layers_outlined, size: 14, color: Colors.grey.shade600),
-                                        ],
-                                      ),
-                                    ],
-                                    if (bannerLocation.isNotEmpty) ...[
-                                      const SizedBox(height: 6),
-                                      Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              bannerLocation,
-                                              style: AppTextStyles.semiBold12.copyWith(color: Colors.grey.shade600),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              textAlign: TextAlign.right,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Icon(Icons.location_on_outlined, size: 14, color: Colors.grey.shade600),
-                                        ],
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              );
+              return _buildBannerCard(context, banner);
             }).toList(),
           ),
         ),
@@ -467,6 +509,102 @@ class GuestHomeScreen extends GetView<GuestHomeController> {
     );
   }
 
+  Widget _buildStoriesList(BuildContext context) {
+    if (controller.stories.isEmpty) return const SizedBox.shrink();
+
+    return SizedBox(
+      height: 110,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: controller.stories.length,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemBuilder: (context, index) {
+          final story = controller.stories[index];
+          
+          // Match API responses for cover and video
+          final String? thumbnailPath = story['thumbnail'] ?? story['cover'] ?? story['url'] ?? story['image'] ?? story['logo'];
+          final String thumbnailUrl = thumbnailPath != null && thumbnailPath.toString().isNotEmpty ? '${ApiUrls.filesUrl}/$thumbnailPath' : '';
+          
+          final String? videoPath = story['videoUrl'] ?? story['video'];
+          final String videoFullUrl = videoPath != null && videoPath.toString().isNotEmpty ? '${ApiUrls.filesUrl}/$videoPath' : '';
+
+          final String storyName = story['title'] ?? story['name'] ?? 'إعلان';
+
+          return GestureDetector(
+            onTap: () {
+              if (videoFullUrl.isNotEmpty) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => StoryVideoScreen(
+                      videoUrl: videoFullUrl,
+                      title: storyName,
+                    ),
+                  ),
+                );
+              } else if (thumbnailUrl.isNotEmpty) {
+                _showFullImage(context, thumbnailUrl);
+              }
+            },
+            child: Container(
+              width: 78,
+              margin: const EdgeInsets.only(left: 12),
+              child: Column(
+                children: [
+                  // Rounded rectangle story thumbnail
+                  Container(
+                    width: 70,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: AppColors.primary,
+                        width: 2.5,
+                      ),
+                      image: thumbnailUrl.isNotEmpty
+                          ? DecorationImage(image: NetworkImage(thumbnailUrl), fit: BoxFit.cover)
+                          : null,
+                      color: Colors.grey.shade200,
+                    ),
+                    child: Stack(
+                      children: [
+                        // Clip the image to rounded rectangle
+                        if (thumbnailUrl.isEmpty)
+                          const Center(child: Icon(Icons.play_circle_outline, color: Colors.grey, size: 28)),
+                        // Play icon overlay for videos
+                        if (videoFullUrl.isNotEmpty && thumbnailUrl.isNotEmpty)
+                          Positioned(
+                            bottom: 4,
+                            right: 4,
+                            child: Container(
+                              padding: const EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.6),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: const Icon(Icons.play_arrow, color: Colors.white, size: 14),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    storyName,
+                    style: AppTextStyles.regular10.copyWith(color: Colors.black87),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   Widget _buildCategoriesGrid(BuildContext context) {
     final categories = [
       {'key': 'INSTITUTE', 'label': 'معاهد تقوية', 'icon': Icons.school, 'bg': Colors.purple.shade100, 'color': Colors.purple, 'count': controller.institutes.length},
@@ -484,28 +622,49 @@ class GuestHomeScreen extends GetView<GuestHomeController> {
 
     final ScrollController scrollController = ScrollController();
     final RxDouble scrollProgress = 0.0.obs;
+    final RxBool hasScrolled = false.obs;
 
     scrollController.addListener(() {
       if (scrollController.hasClients) {
         final maxScroll = scrollController.position.maxScrollExtent;
         if (maxScroll > 0) {
           scrollProgress.value = scrollController.offset / maxScroll;
+          if (scrollController.offset > 10) hasScrolled.value = true;
         }
       }
     });
 
     return Column(
       children: [
+        // Scroll hint text above categories
+        Obx(() => AnimatedOpacity(
+          opacity: hasScrolled.value ? 0.0 : 1.0,
+          duration: const Duration(milliseconds: 400),
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.swipe, size: 16, color: AppColors.primary.withValues(alpha: 0.6)),
+                const SizedBox(width: 6),
+                Text(
+                  'اسحب لعرض المزيد',
+                  style: AppTextStyles.regular12.copyWith(color: AppColors.primary.withValues(alpha: 0.6)),
+                ),
+              ],
+            ),
+          ),
+        )),
         SizedBox(
-          height: 220, // Enough height for two rows
+          height: 230,
           child: SingleChildScrollView(
             controller: scrollController,
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Wrap(
               direction: Axis.vertical,
-              spacing: 16, // vertical spacing between rows
-              runSpacing: 20, // horizontal spacing between items
+              spacing: 16,
+              runSpacing: 16,
               children: categories.map((cat) {
                 final displayCount = controller.getBadgeDisplayCount(cat['key'] as String, cat['count'] as int);
                 return GestureDetector(
@@ -514,7 +673,7 @@ class GuestHomeScreen extends GetView<GuestHomeController> {
                     _navigateToCategory(context, cat['key'] as String, cat['label'] as String);
                   },
                   child: SizedBox(
-                    width: 76,
+                    width: 80,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -522,13 +681,13 @@ class GuestHomeScreen extends GetView<GuestHomeController> {
                           clipBehavior: Clip.none,
                           children: [
                             Container(
-                              width: 65, height: 65,
+                              width: 68, height: 68,
                               decoration: BoxDecoration(
                                 color: (cat['bg'] as Color).withValues(alpha: 0.3),
                                 shape: BoxShape.circle,
                                 border: Border.all(color: (cat['color'] as Color).withValues(alpha: 0.2), width: 1.5),
                               ),
-                              child: Icon(cat['icon'] as IconData, color: cat['color'] as Color, size: 28),
+                              child: Icon(cat['icon'] as IconData, color: cat['color'] as Color, size: 30),
                             ),
                             if (displayCount > 0)
                               Positioned(
@@ -686,157 +845,15 @@ class GuestHomeScreen extends GetView<GuestHomeController> {
         const SizedBox(height: 12),
         CarouselSlider(
           options: CarouselOptions(
-            height: 380, // Taller vertical height for the card
+            height: 380,
             autoPlay: true,
             autoPlayInterval: const Duration(seconds: 5),
             enlargeCenterPage: true,
-            viewportFraction: 0.75, // Show mostly one card, hint of the next
+            viewportFraction: 0.75,
             aspectRatio: 3 / 4, 
           ),
           items: ads.map((banner) {
-            final imageUrl = banner['url'] != null ? '${ApiUrls.filesUrl}/${banner['url']}' : '';
-            final String bannerTitle = banner['title'] ?? '';
-            final String bannerDesc = banner['description'] ?? '';
-            final String bannerLocation = banner['link'] ?? '';
-
-            return GestureDetector(
-              onTap: () => _showFullImage(context, imageUrl),
-              child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: Colors.white,
-                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 5))],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Top Image Part
-                    Expanded(
-                      child: Stack(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                              image: DecorationImage(image: NetworkImage(imageUrl), fit: BoxFit.cover),
-                              color: Colors.grey.shade200,
-                            ),
-                          ),
-                          // Heart Icon
-                          Positioned(
-                            top: 12,
-                            left: 12,
-                            child: Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.black.withValues(alpha: 0.5),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(Icons.favorite_border, color: Colors.white, size: 20),
-                            ),
-                          ),
-                          // Verified Badge
-                          Positioned(
-                            top: 12,
-                            right: 12,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.9),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Row(
-                                children: [
-                                  const Icon(Icons.verified, color: Colors.grey, size: 14),
-                                  const SizedBox(width: 4),
-                                  Text('تم التحقق', style: AppTextStyles.semiBold10.copyWith(color: Colors.grey.shade700)),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Bottom Text Part
-                    if (bannerTitle.isNotEmpty || bannerDesc.isNotEmpty || bannerLocation.isNotEmpty)
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Fake views count
-                            Row(
-                              children: [
-                                const Icon(Icons.remove_red_eye_outlined, size: 16, color: Colors.grey),
-                                const SizedBox(width: 4),
-                                Text('1.2k عرض', style: AppTextStyles.regular12.copyWith(color: Colors.grey)),
-                              ],
-                            ),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  if (bannerTitle.isNotEmpty)
-                                    Text(
-                                      bannerTitle,
-                                      style: AppTextStyles.bold16.copyWith(color: Colors.black87),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      textAlign: TextAlign.right,
-                                    ),
-                                  if (bannerDesc.isNotEmpty) ...[
-                                    const SizedBox(height: 6),
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            bannerDesc,
-                                            style: AppTextStyles.semiBold12.copyWith(color: Colors.grey.shade600),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            textAlign: TextAlign.right,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Icon(Icons.layers_outlined, size: 14, color: Colors.grey.shade600),
-                                      ],
-                                    ),
-                                  ],
-                                  if (bannerLocation.isNotEmpty) ...[
-                                    const SizedBox(height: 6),
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            bannerLocation,
-                                            style: AppTextStyles.semiBold12.copyWith(color: Colors.grey.shade600),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            textAlign: TextAlign.right,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Icon(Icons.location_on_outlined, size: 14, color: Colors.grey.shade600),
-                                      ],
-                                    ),
-                                  ],
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            );
+            return _buildBannerCard(context, banner);
           }).toList(),
         ),
       ],

@@ -10,7 +10,11 @@ class GuestHomeController extends GetxController {
   RxList<dynamic> banners = <dynamic>[].obs;
   RxList<dynamic> horizontalBanners = <dynamic>[].obs;
   RxList<dynamic> verticalBanners = <dynamic>[].obs;
+  RxList<dynamic> stories = <dynamic>[].obs;
   RxInt currentBannerIndex = 0.obs;
+
+  // Liked banners (stored locally)
+  RxSet<String> likedBannerIds = <String>{}.obs;
 
   // Directory Listing categories
   RxList<dynamic> institutes = <dynamic>[].obs;
@@ -33,8 +37,11 @@ class GuestHomeController extends GetxController {
   RxString searchQuery = ''.obs;
 
   static const List<String> provinces = [
-    'بغداد - الرصافة',
-    'بغداد - الكرخ',
+    'بغداد - الرصافة الأولى',
+    'بغداد - الرصافة الثانية',
+    'بغداد - الرصافة الثالثة',
+    'بغداد - الكرخ الأولى',
+    'بغداد - الكرخ الثانية',
     'البصرة',
     'نينوى',
     'أربيل',
@@ -58,9 +65,74 @@ class GuestHomeController extends GetxController {
   void onInit() {
     super.onInit();
     _loadClearedBadges();
+    _loadLikedBanners();
     fetchDirectory();
     fetchBanners();
+    fetchStories();
     fetchUnreadNotificationsCount();
+  }
+
+  void _loadLikedBanners() {
+    try {
+      var box = Hive.box(AppStrings.boxKey);
+      List<String> saved = box.get('liked_banners', defaultValue: <String>[])!.cast<String>();
+      likedBannerIds.addAll(saved);
+    } catch (e) {
+      dprint('Error loading liked banners: $e');
+    }
+  }
+
+  bool isBannerLiked(String bannerId) {
+    return likedBannerIds.contains(bannerId);
+  }
+
+  void toggleLike(String bannerId) {
+    try {
+      if (likedBannerIds.contains(bannerId)) {
+        likedBannerIds.remove(bannerId);
+      } else {
+        likedBannerIds.add(bannerId);
+      }
+      var box = Hive.box(AppStrings.boxKey);
+      box.put('liked_banners', likedBannerIds.toList());
+    } catch (e) {
+      dprint('Error toggling like: $e');
+    }
+  }
+
+  Future<void> incrementBannerViewCount(String bannerId) async {
+    try {
+      await ApiService().post(
+        url: '/public/banner/$bannerId/view',
+      );
+      // Update local view count
+      for (int i = 0; i < banners.length; i++) {
+        if (banners[i]['id'].toString() == bannerId) {
+          banners[i]['viewCount'] = (banners[i]['viewCount'] ?? 0) + 1;
+          banners.refresh();
+          horizontalBanners.refresh();
+          verticalBanners.refresh();
+          break;
+        }
+      }
+    } catch (e) {
+      dprint('Error incrementing view count: $e');
+    }
+  }
+
+  String formatViewCount(dynamic count) {
+    int views = 0;
+    if (count is int) {
+      views = count;
+    } else if (count is String) {
+      views = int.tryParse(count) ?? 0;
+    }
+    if (views >= 1000000) {
+      return '${(views / 1000000).toStringAsFixed(1)}M';
+    } else if (views >= 1000) {
+      return '${(views / 1000).toStringAsFixed(1)}k';
+    }
+    return '$views';
   }
 
   void _loadClearedBadges() {
@@ -134,6 +206,23 @@ class GuestHomeController extends GetxController {
       }
     } catch (e) {
       dprint('Banner fetch error: $e');
+    }
+  }
+
+  Future<void> fetchStories() async {
+    try {
+      final response = await ApiService().get(
+        url: '/public/story', // Placeholder for stories API
+      );
+      if (response.statusCode == 200 && response.data != null) {
+        if (response.data is List) {
+          stories.value = response.data;
+        } else if (response.data['stories'] != null) {
+          stories.value = response.data['stories'];
+        }
+      }
+    } catch (e) {
+      dprint('Stories fetch error: $e');
     }
   }
 
